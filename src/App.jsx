@@ -6,6 +6,7 @@ import AdminPanel from "./pages/AdminPanel"
 import EditProfile from "./pages/EditProfile"
 import JobBoard from "./pages/JobBoard"
 import ProtectedRoute from "./components/ProtectedRoute"
+import Analytics from "./pages/Analytics" 
 
 function App() {
   return (
@@ -38,6 +39,12 @@ function App() {
             <AdminPanel />
           </ProtectedRoute>
         } />
+
+        <Route path="/analytics" element={
+        <ProtectedRoute>
+         <Analytics />
+        </ProtectedRoute>
+} />
       </Routes>
     </BrowserRouter>
   )
