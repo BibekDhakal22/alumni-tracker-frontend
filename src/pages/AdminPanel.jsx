@@ -12,9 +12,7 @@ function AdminPanel() {
   const [alumniList, setAlumniList] = useState([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    fetchAlumni()
-  }, [])
+  useEffect(() => { fetchAlumni() }, [])
 
   const fetchAlumni = async () => {
     try {
@@ -42,14 +40,11 @@ function AdminPanel() {
     navigate("/")
   }
 
-  // Filter logic
   const filtered = alumniList.filter((a) => {
     const matchSearch =
       a.name.toLowerCase().includes(search.toLowerCase()) ||
       a.email.toLowerCase().includes(search.toLowerCase())
-    const matchBatch = filterBatch
-      ? a.alumni_profile?.batch_year === filterBatch
-      : true
+    const matchBatch = filterBatch ? a.alumni_profile?.batch_year === filterBatch : true
     return matchSearch && matchBatch
   })
 
@@ -58,150 +53,185 @@ function AdminPanel() {
   const unemployed = alumniList.filter(a => a.alumni_profile?.status === "unemployed").length
   const batches = [...new Set(alumniList.map(a => a.alumni_profile?.batch_year).filter(Boolean))]
 
-  return (
-    <div className="min-h-screen bg-gray-100">
+  const statusColor = {
+    employed: { bg: '#dcfce7', color: '#15803d' },
+    unemployed: { bg: '#fee2e2', color: '#dc2626' },
+    studying: { bg: '#dbeafe', color: '#1d4ed8' },
+  }
 
-      {/* Navbar */}
-      <nav className="bg-blue-600 text-white px-6 py-4 flex justify-between items-center shadow">
-        <h1 className="text-xl font-bold">Alumni Tracker — Admin</h1>
-        <button
-          onClick={() => navigate("/analytics")}
-          className="text-white text-sm hover:underline"
-        >
-          Analytics
-        </button>
+  return (
+    <div style={styles.wrapper}>
+      {/* Sidebar */}
+      <aside style={styles.sidebar}>
+        <div style={styles.sidebarLogo}>
+          <div style={styles.logoMark}>AT</div>
+          <div>
+            <div style={styles.logoText}>Alumni Tracker</div>
+            <div style={styles.logoSub}>Admin Panel</div>
+          </div>
+        </div>
+        <nav style={styles.sidebarNav}>
+          {[
+            { icon: "⊞", label: "Admin Panel", path: "/admin", active: true },
+            { icon: "◉", label: "Analytics", path: "/analytics" },
+            { icon: "◈", label: "Job Board", path: "/jobs" },
+          ].map((item) => (
+            <button
+              key={item.path}
+              onClick={() => navigate(item.path)}
+              style={{ ...styles.navItem, ...(item.active ? styles.navItemActive : {}) }}
+              onMouseEnter={e => !item.active && (e.currentTarget.style.background = '#1e3a8a')}
+              onMouseLeave={e => !item.active && (e.currentTarget.style.background = 'transparent')}
+            >
+              <span style={styles.navIcon}>{item.icon}</span>
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </nav>
         <button
           onClick={handleLogout}
-          className="bg-white text-blue-600 px-4 py-1 rounded-lg text-sm font-medium hover:bg-gray-100 transition"
+          style={styles.logoutBtn}
+          onMouseEnter={e => e.currentTarget.style.background = '#1e3a8a'}
+          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
         >
-          Logout
+          <span style={styles.navIcon}>→</span>
+          <span>Logout</span>
         </button>
-      </nav>
+      </aside>
 
-      <div className="max-w-6xl mx-auto py-10 px-4">
+      {/* Main */}
+      <main style={styles.main}>
+        <header style={styles.topBar}>
+          <div>
+            <h1 style={styles.pageTitle}>Alumni Management</h1>
+            <p style={styles.pageSubtitle}>Manage and monitor all registered alumni</p>
+          </div>
+          <button
+            style={styles.exportBtn}
+            onMouseEnter={e => e.currentTarget.style.background = '#15803d'}
+            onMouseLeave={e => e.currentTarget.style.background = '#16a34a'}
+          >
+            ↓ Export CSV
+          </button>
+        </header>
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
-          <StatCard label="Total Alumni" value={totalAlumni} color="blue" />
-          <StatCard label="Employed" value={employed} color="green" />
-          <StatCard label="Unemployed" value={unemployed} color="red" />
-        </div>
-
-        {/* Tabs */}
-        <div className="flex gap-2 mb-6">
-          {["alumni", "pending"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-5 py-2 rounded-lg text-sm font-medium transition ${activeTab === tab
-                  ? "bg-blue-600 text-white"
-                  : "bg-white text-gray-600 hover:bg-gray-50"
-                }`}
-            >
-              {tab === "alumni" ? "All Alumni" : "Pending Approvals"}
-            </button>
+        {/* Stats */}
+        <div style={styles.statsGrid}>
+          {[
+            { label: "Total Alumni", value: totalAlumni, icon: "👥", color: '#eff6ff', border: '#bfdbfe', text: '#1d4ed8' },
+            { label: "Employed", value: employed, icon: "💼", color: '#f0fdf4', border: '#bbf7d0', text: '#15803d' },
+            { label: "Unemployed", value: unemployed, icon: "📋", color: '#fef2f2', border: '#fecaca', text: '#dc2626' },
+            { label: "Batch Years", value: batches.length, icon: "🎓", color: '#faf5ff', border: '#e9d5ff', text: '#7c3aed' },
+          ].map((s, i) => (
+            <div key={i} style={{ ...styles.statCard, background: s.color, border: `1px solid ${s.border}` }}>
+              <div style={styles.statTop}>
+                <span style={styles.statIcon}>{s.icon}</span>
+                <span style={{ ...styles.statValue, color: s.text }}>{s.value}</span>
+              </div>
+              <div style={styles.statLabel}>{s.label}</div>
+            </div>
           ))}
         </div>
 
-        {/* Main Table Card */}
-        <div className="bg-white rounded-xl shadow-md p-6">
+        {/* Table Card */}
+        <div style={styles.tableCard}>
+          {/* Tabs */}
+          <div style={styles.tabRow}>
+            {["alumni", "pending"].map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                style={{ ...styles.tab, ...(activeTab === tab ? styles.tabActive : {}) }}
+              >
+                {tab === "alumni" ? "All Alumni" : "Pending Approvals"}
+              </button>
+            ))}
+          </div>
 
-          {/* Search and Filter */}
-          <div className="flex flex-col md:flex-row gap-3 mb-6">
-            <input
-              type="text"
-              placeholder="Search by name or email..."
-              className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+          {/* Filters */}
+          <div style={styles.filterRow}>
+            <div style={styles.searchWrapper}>
+              <span style={styles.searchIcon}>🔍</span>
+              <input
+                type="text"
+                placeholder="Search by name or email..."
+                style={styles.searchInput}
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
+            </div>
             <select
-              className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              style={styles.select}
               value={filterBatch}
-              onChange={(e) => setFilterBatch(e.target.value)}
+              onChange={e => setFilterBatch(e.target.value)}
             >
               <option value="">All Batches</option>
-              {batches.sort().map((b) => (
+              {batches.sort().map(b => (
                 <option key={b} value={b}>{b}</option>
               ))}
             </select>
-            <button className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition">
-              Export CSV
-            </button>
           </div>
 
           {/* Table */}
           {activeTab === "alumni" && (
-            <div className="overflow-x-auto">
+            <div style={styles.tableWrapper}>
               {loading ? (
-                <p className="text-center text-gray-400 py-8">Loading...</p>
+                <p style={styles.emptyText}>Loading...</p>
               ) : (
-                <table className="w-full text-sm">
+                <table style={styles.table}>
                   <thead>
-                    <tr className="bg-gray-50 text-gray-500 text-left">
-                      <th className="px-4 py-3">#</th>
-                      <th className="px-4 py-3">Name</th>
-                      <th className="px-4 py-3">Email</th>
-                      <th className="px-4 py-3">Batch</th>
-                      <th className="px-4 py-3">Job</th>
-                      <th className="px-4 py-3">Company</th>
-                      <th className="px-4 py-3">Status</th>
-                      <th className="px-4 py-3">Actions</th>
+                    <tr style={styles.thead}>
+                      {["#", "Name", "Email", "Batch", "Job Title", "Company", "Status", "Actions"].map(h => (
+                        <th key={h} style={styles.th}>{h}</th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody>
                     {filtered.length === 0 ? (
                       <tr>
-                        <td colSpan="8" className="text-center text-gray-400 py-8">
-                          No alumni found
-                        </td>
+                        <td colSpan="8" style={styles.emptyText}>No alumni found</td>
                       </tr>
-                    ) : (
-                      filtered.map((a, i) => (
-                        <tr key={a.id} className="border-t hover:bg-gray-50 transition">
-                          <td className="px-4 py-3 text-gray-400">{i + 1}</td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-2">
-                              <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">
-                                {a.name.charAt(0)}
-                              </div>
-                              <span className="font-medium text-gray-800">{a.name}</span>
+                    ) : filtered.map((a, i) => {
+                      const s = statusColor[a.alumni_profile?.status] || { bg: '#f1f5f9', color: '#64748b' }
+                      return (
+                        <tr key={a.id}
+                          style={styles.tr}
+                          onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
+                          onMouseLeave={e => e.currentTarget.style.background = 'white'}
+                        >
+                          <td style={{ ...styles.td, color: '#94a3b8' }}>{i + 1}</td>
+                          <td style={styles.td}>
+                            <div style={styles.nameCell}>
+                              <div style={styles.avatar}>{a.name.charAt(0)}</div>
+                              <span style={styles.nameText}>{a.name}</span>
                             </div>
                           </td>
-                          <td className="px-4 py-3 text-gray-500">{a.email}</td>
-                          <td className="px-4 py-3 text-gray-600">
-                            {a.alumni_profile?.batch_year || "-"}
-                          </td>
-                          <td className="px-4 py-3 text-gray-600">
-                            {a.alumni_profile?.current_job || "-"}
-                          </td>
-                          <td className="px-4 py-3 text-gray-600">
-                            {a.alumni_profile?.company || "-"}
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${a.alumni_profile?.status === "employed"
-                                ? "bg-green-100 text-green-700"
-                                : "bg-red-100 text-red-600"
-                              }`}>
+                          <td style={{ ...styles.td, color: '#64748b' }}>{a.email}</td>
+                          <td style={styles.td}>{a.alumni_profile?.batch_year || "—"}</td>
+                          <td style={styles.td}>{a.alumni_profile?.current_job || "—"}</td>
+                          <td style={styles.td}>{a.alumni_profile?.company || "—"}</td>
+                          <td style={styles.td}>
+                            <span style={{ ...styles.badge, background: s.bg, color: s.color }}>
                               {a.alumni_profile?.status || "unknown"}
                             </span>
                           </td>
-                          <td className="px-4 py-3">
-                            <div className="flex gap-2">
-                              <button className="text-blue-600 hover:underline text-xs">
-                                Edit
-                              </button>
+                          <td style={styles.td}>
+                            <div style={styles.actions}>
+                              <button style={styles.editBtn}
+                                onMouseEnter={e => e.currentTarget.style.background = '#dbeafe'}
+                                onMouseLeave={e => e.currentTarget.style.background = '#eff6ff'}
+                              >Edit</button>
                               <button
+                                style={styles.deleteBtn}
                                 onClick={() => handleDelete(a.id)}
-                                className="text-red-500 hover:underline text-xs"
-                              >
-                                Delete
-                              </button>
+                                onMouseEnter={e => e.currentTarget.style.background = '#fecaca'}
+                                onMouseLeave={e => e.currentTarget.style.background = '#fee2e2'}
+                              >Delete</button>
                             </div>
                           </td>
                         </tr>
-                      ))
-                    )}
+                      )
+                    })}
                   </tbody>
                 </table>
               )}
@@ -209,31 +239,118 @@ function AdminPanel() {
           )}
 
           {activeTab === "pending" && (
-            <div className="text-center text-gray-400 py-12">
-              <p className="text-4xl mb-3">📋</p>
-              <p className="font-medium">No pending approvals</p>
-              <p className="text-sm mt-1">New registrations will appear here for review</p>
+            <div style={styles.emptyState}>
+              <div style={styles.emptyIcon}>📋</div>
+              <p style={styles.emptyTitle}>No pending approvals</p>
+              <p style={styles.emptyDesc}>New registrations will appear here for review</p>
             </div>
           )}
-
         </div>
-      </div>
+      </main>
     </div>
   )
 }
 
-function StatCard({ label, value, color }) {
-  const colors = {
-    blue: "bg-blue-50 text-blue-600",
-    green: "bg-green-50 text-green-600",
-    red: "bg-red-50 text-red-600",
-  }
-  return (
-    <div className={`rounded-xl p-5 text-center ${colors[color]}`}>
-      <p className="text-3xl font-bold">{value}</p>
-      <p className="text-sm mt-1">{label}</p>
-    </div>
-  )
+const styles = {
+  wrapper: { display: 'flex', minHeight: '100vh', background: '#f1f5f9', fontFamily: 'sans-serif' },
+  sidebar: {
+    width: '240px', background: '#1e3a8a', display: 'flex',
+    flexDirection: 'column', padding: '24px 0', position: 'fixed',
+    top: 0, left: 0, height: '100vh', zIndex: 10,
+  },
+  sidebarLogo: {
+    display: 'flex', alignItems: 'center', gap: '12px',
+    padding: '0 20px 24px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '16px',
+  },
+  logoMark: {
+    width: '40px', height: '40px', background: '#2563eb', borderRadius: '10px',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    color: 'white', fontWeight: '700', fontSize: '14px', flexShrink: 0,
+  },
+  logoText: { color: 'white', fontWeight: '700', fontSize: '15px' },
+  logoSub: { color: 'rgba(255,255,255,0.5)', fontSize: '11px', marginTop: '2px' },
+  sidebarNav: { flex: 1, padding: '0 12px', display: 'flex', flexDirection: 'column', gap: '4px' },
+  navItem: {
+    display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px',
+    borderRadius: '10px', border: 'none', background: 'transparent',
+    color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: '14px',
+    fontWeight: '500', transition: 'all 0.15s', textAlign: 'left', width: '100%',
+  },
+  navItemActive: { background: '#2563eb', color: 'white' },
+  navIcon: { fontSize: '16px', width: '20px', textAlign: 'center' },
+  logoutBtn: {
+    display: 'flex', alignItems: 'center', gap: '12px', padding: '16px 24px',
+    border: 'none', background: 'transparent', color: 'rgba(255,255,255,0.6)',
+    cursor: 'pointer', fontSize: '14px', borderTop: '1px solid rgba(255,255,255,0.1)',
+    transition: 'all 0.15s', width: '100%',
+  },
+  main: { marginLeft: '240px', flex: 1, padding: '32px' },
+  topBar: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' },
+  pageTitle: { fontSize: '24px', fontWeight: '700', color: '#0f172a', margin: '0 0 4px' },
+  pageSubtitle: { fontSize: '14px', color: '#64748b', margin: 0 },
+  exportBtn: {
+    background: '#16a34a', color: 'white', border: 'none', padding: '10px 20px',
+    borderRadius: '10px', cursor: 'pointer', fontSize: '14px', fontWeight: '600',
+    transition: 'background 0.2s',
+  },
+  statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '16px', marginBottom: '24px' },
+  statCard: { borderRadius: '14px', padding: '20px' },
+  statTop: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' },
+  statIcon: { fontSize: '24px' },
+  statValue: { fontSize: '32px', fontWeight: '700' },
+  statLabel: { fontSize: '13px', color: '#64748b', fontWeight: '500' },
+  tableCard: { background: 'white', borderRadius: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', overflow: 'hidden' },
+  tabRow: { display: 'flex', borderBottom: '1px solid #f1f5f9', padding: '0 24px' },
+  tab: {
+    padding: '16px 20px', border: 'none', background: 'transparent',
+    fontSize: '14px', fontWeight: '600', color: '#94a3b8', cursor: 'pointer',
+    borderBottom: '2px solid transparent', transition: 'all 0.15s',
+  },
+  tabActive: { color: '#1d4ed8', borderBottom: '2px solid #1d4ed8' },
+  filterRow: { display: 'flex', gap: '12px', padding: '16px 24px', borderBottom: '1px solid #f8fafc' },
+  searchWrapper: { flex: 1, position: 'relative' },
+  searchIcon: { position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', fontSize: '14px' },
+  searchInput: {
+    width: '100%', padding: '10px 12px 10px 36px', border: '1.5px solid #e2e8f0',
+    borderRadius: '10px', fontSize: '14px', outline: 'none', boxSizing: 'border-box',
+    background: '#f8fafc',
+  },
+  select: {
+    padding: '10px 14px', border: '1.5px solid #e2e8f0', borderRadius: '10px',
+    fontSize: '14px', outline: 'none', background: '#f8fafc', cursor: 'pointer',
+  },
+  tableWrapper: { overflowX: 'auto', padding: '0 24px 24px' },
+  table: { width: '100%', borderCollapse: 'collapse', marginTop: '8px' },
+  thead: { background: '#f8fafc' },
+  th: {
+    padding: '12px 12px', textAlign: 'left', fontSize: '11px', fontWeight: '700',
+    color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px',
+    borderBottom: '1px solid #f1f5f9',
+  },
+  tr: { transition: 'background 0.15s' },
+  td: { padding: '14px 12px', fontSize: '14px', color: '#334155', borderBottom: '1px solid #f8fafc' },
+  nameCell: { display: 'flex', alignItems: 'center', gap: '10px' },
+  avatar: {
+    width: '32px', height: '32px', borderRadius: '50%', background: '#dbeafe',
+    color: '#1d4ed8', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontWeight: '700', fontSize: '13px', flexShrink: 0,
+  },
+  nameText: { fontWeight: '600', color: '#0f172a' },
+  badge: { padding: '4px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: '600' },
+  actions: { display: 'flex', gap: '6px' },
+  editBtn: {
+    padding: '5px 12px', background: '#eff6ff', color: '#1d4ed8', border: 'none',
+    borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: '600', transition: 'background 0.15s',
+  },
+  deleteBtn: {
+    padding: '5px 12px', background: '#fee2e2', color: '#dc2626', border: 'none',
+    borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: '600', transition: 'background 0.15s',
+  },
+  emptyText: { textAlign: 'center', color: '#94a3b8', padding: '32px' },
+  emptyState: { padding: '60px', textAlign: 'center' },
+  emptyIcon: { fontSize: '48px', marginBottom: '16px' },
+  emptyTitle: { fontSize: '16px', fontWeight: '600', color: '#334155', marginBottom: '8px' },
+  emptyDesc: { fontSize: '14px', color: '#94a3b8' },
 }
 
 export default AdminPanel

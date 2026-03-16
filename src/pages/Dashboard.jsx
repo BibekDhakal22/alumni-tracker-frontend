@@ -8,12 +8,10 @@ function Dashboard() {
   const { user, logout } = useAuth()
   const [alumniList, setAlumniList] = useState([])
   const [loading, setLoading] = useState(true)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
-    if (!user) {
-      navigate("/")
-      return
-    }
+    if (!user) { navigate("/"); return }
     fetchAlumni()
   }, [user])
 
@@ -40,142 +38,332 @@ function Dashboard() {
   const total = alumniList.length
   const batches = [...new Set(alumniList.map(a => a.alumni_profile?.batch_year).filter(Boolean))]
 
+  const statusColor = {
+    employed: { bg: '#dcfce7', color: '#15803d' },
+    unemployed: { bg: '#fee2e2', color: '#dc2626' },
+    studying: { bg: '#dbeafe', color: '#1d4ed8' },
+  }
+  const st = statusColor[profile?.status] || statusColor.unemployed
+
   return (
-    <div className="min-h-screen bg-gray-100">
-
-      {/* Navbar */}
-      <nav className="bg-blue-600 text-white px-6 py-4 flex justify-between items-center shadow">
-        <h1 className="text-xl font-bold">Alumni Tracker</h1>
-        <div className="flex items-center gap-4">
-          <span className="text-sm">Welcome, {user.name}</span>
-          <button
-  onClick={() => navigate("/jobs")}
-  className="bg-white text-blue-600 px-4 py-1 rounded-lg text-sm font-medium hover:bg-gray-100 transition"
->
-  Job Board
-</button>
-          <button
-            onClick={handleLogout}
-            className="bg-white text-blue-600 px-4 py-1 rounded-lg text-sm font-medium hover:bg-gray-100 transition"
-          >
-            Logout
-          </button>
+    <div style={styles.wrapper}>
+      {/* Sidebar */}
+      <aside style={styles.sidebar}>
+        <div style={styles.sidebarLogo}>
+          <div style={styles.logoMark}>AT</div>
+          <span style={styles.logoText}>Alumni Tracker</span>
         </div>
-      </nav>
+        <nav style={styles.sidebarNav}>
+          {[
+            { icon: "⊞", label: "Dashboard", path: "/dashboard", active: true },
+            { icon: "◎", label: "Edit Profile", path: "/profile/edit" },
+            { icon: "◈", label: "Job Board", path: "/jobs" },
+            { icon: "◉", label: "Analytics", path: "/analytics" },
+          ].map((item) => (
+            <button
+              key={item.path}
+              onClick={() => navigate(item.path)}
+              style={{
+                ...styles.navItem,
+                ...(item.active ? styles.navItemActive : {})
+              }}
+              onMouseEnter={e => !item.active && (e.currentTarget.style.background = '#1e3a8a')}
+              onMouseLeave={e => !item.active && (e.currentTarget.style.background = 'transparent')}
+            >
+              <span style={styles.navIcon}>{item.icon}</span>
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </nav>
+        <button
+          onClick={handleLogout}
+          style={styles.logoutBtn}
+          onMouseEnter={e => e.currentTarget.style.background = '#1e3a8a'}
+          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+        >
+          <span style={styles.navIcon}>→</span>
+          <span>Logout</span>
+        </button>
+      </aside>
 
-      <div className="max-w-4xl mx-auto py-10 px-4">
+      {/* Main Content */}
+      <main style={styles.main}>
+        {/* Top Bar */}
+        <header style={styles.topBar}>
+          <div>
+            <h1 style={styles.pageTitle}>Dashboard</h1>
+            <p style={styles.pageSubtitle}>Welcome back, {user.name}</p>
+          </div>
+          <div style={styles.topBarRight}>
+            <div style={styles.avatar}>
+              {user.name.charAt(0)}
+            </div>
+          </div>
+        </header>
 
-        {/* Profile Card */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
-          <div className="flex items-center gap-6">
-            <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-3xl font-bold">
+        {/* Profile Hero Card */}
+        <div style={styles.heroCard}>
+          <div style={styles.heroLeft}>
+            <div style={styles.heroBigAvatar}>
               {user.name.charAt(0)}
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-800">{user.name}</h2>
-              <p className="text-gray-500">Batch of {profile?.batch_year || "N/A"}</p>
-              <p className="text-blue-600 text-sm">{user.email}</p>
+              <h2 style={styles.heroName}>{user.name}</h2>
+              <p style={styles.heroEmail}>{user.email}</p>
+              <div style={styles.heroBadges}>
+                <span style={styles.batchBadge}>
+                  Batch {profile?.batch_year || "N/A"}
+                </span>
+                <span style={{
+                  ...styles.statusBadge,
+                  background: st.bg,
+                  color: st.color
+                }}>
+                  {profile?.status || "Not set"}
+                </span>
+              </div>
             </div>
-            <button
-              onClick={() => navigate("/profile/edit")}
-              className="ml-auto bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
-            >
-              Edit Profile
-            </button>
           </div>
+          <button
+            style={styles.editBtn}
+            onClick={() => navigate("/profile/edit")}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+          >
+            Edit Profile
+          </button>
+        </div>
+
+        {/* Stats Row */}
+        <div style={styles.statsGrid}>
+          {[
+            { label: "Total Alumni", value: total, icon: "👥", color: '#eff6ff', border: '#bfdbfe' },
+            { label: "Employed", value: employed, icon: "💼", color: '#f0fdf4', border: '#bbf7d0' },
+            { label: "Batch Years", value: batches.length, icon: "🎓", color: '#faf5ff', border: '#e9d5ff' },
+            { label: "Jobs Posted", value: "-", icon: "📋", color: '#fff7ed', border: '#fed7aa' },
+          ].map((stat, i) => (
+            <div key={i} style={{
+              ...styles.statCard,
+              background: stat.color,
+              border: `1px solid ${stat.border}`
+            }}>
+              <div style={styles.statIcon}>{stat.icon}</div>
+              <div style={styles.statValue}>{stat.value}</div>
+              <div style={styles.statLabel}>{stat.label}</div>
+            </div>
+          ))}
         </div>
 
         {/* Info Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">
-              Personal Information
-            </h3>
-            <div className="space-y-3">
-              <InfoRow label="Phone" value={profile?.phone || "Not set"} />
-              <InfoRow label="Location" value={profile?.address || "Not set"} />
-              <InfoRow label="LinkedIn" value={profile?.linkedin || "Not set"} />
+        <div style={styles.infoGrid}>
+          {/* Personal Info */}
+          <div style={styles.infoCard}>
+            <div style={styles.cardHeader}>
+              <h3 style={styles.cardTitle}>Personal Information</h3>
+              <div style={styles.cardDivider} />
             </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">
-              Employment Details
-            </h3>
-            <div className="space-y-3">
-              <InfoRow label="Job Title" value={profile?.current_job || "Not set"} />
-              <InfoRow label="Company" value={profile?.company || "Not set"} />
-              <InfoRow label="Status" value={profile?.status || "Not set"} />
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <StatCard number={total} label="Total Alumni" color="blue" />
-          <StatCard number={employed} label="Employed" color="green" />
-          <StatCard number={batches.length} label="Batch Years" color="purple" />
-        </div>
-
-        {/* Recent Alumni */}
-        <div className="bg-white rounded-xl shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">
-            Recent Alumni
-          </h3>
-          {loading ? (
-            <p className="text-center text-gray-400 py-6">Loading...</p>
-          ) : alumniList.length === 0 ? (
-            <p className="text-center text-gray-400 py-6">No alumni found</p>
-          ) : (
-            <div className="space-y-3">
-              {alumniList.slice(0, 5).map((a, i) => (
-                <div key={i} className="flex items-center justify-between py-2 border-b last:border-0">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">
-                      {a.name.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="text-gray-800 font-medium text-sm">{a.name}</p>
-                      <p className="text-gray-400 text-xs">Batch {a.alumni_profile?.batch_year || "N/A"}</p>
-                    </div>
-                  </div>
-                  <span className="text-gray-500 text-sm">
-                    {a.alumni_profile?.current_job
-                      ? `${a.alumni_profile.current_job} at ${a.alumni_profile.company}`
-                      : "Not employed"}
-                  </span>
+            <div style={styles.infoList}>
+              {[
+                { label: "Phone", value: profile?.phone || "Not set" },
+                { label: "Location", value: profile?.address || "Not set" },
+                { label: "LinkedIn", value: profile?.linkedin || "Not set" },
+              ].map((item, i) => (
+                <div key={i} style={styles.infoRow}>
+                  <span style={styles.infoLabel}>{item.label}</span>
+                  <span style={styles.infoValue}>{item.value}</span>
                 </div>
               ))}
             </div>
-          )}
+          </div>
+
+          {/* Employment */}
+          <div style={styles.infoCard}>
+            <div style={styles.cardHeader}>
+              <h3 style={styles.cardTitle}>Employment Details</h3>
+              <div style={styles.cardDivider} />
+            </div>
+            <div style={styles.infoList}>
+              {[
+                { label: "Job Title", value: profile?.current_job || "Not set" },
+                { label: "Company", value: profile?.company || "Not set" },
+                { label: "Industry", value: profile?.industry || "Not set" },
+              ].map((item, i) => (
+                <div key={i} style={styles.infoRow}>
+                  <span style={styles.infoLabel}>{item.label}</span>
+                  <span style={styles.infoValue}>{item.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
-      </div>
+        {/* Recent Alumni */}
+        <div style={styles.tableCard}>
+          <div style={styles.cardHeader}>
+            <h3 style={styles.cardTitle}>Recent Alumni</h3>
+            <div style={styles.cardDivider} />
+          </div>
+          {loading ? (
+            <p style={styles.emptyText}>Loading...</p>
+          ) : alumniList.length === 0 ? (
+            <p style={styles.emptyText}>No alumni found</p>
+          ) : (
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  {["Name", "Batch", "Job", "Company", "Status"].map(h => (
+                    <th key={h} style={styles.th}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {alumniList.slice(0, 5).map((a, i) => {
+                  const s = statusColor[a.alumni_profile?.status] || statusColor.unemployed
+                  return (
+                    <tr key={i} style={styles.tr}
+                      onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'white'}
+                    >
+                      <td style={styles.td}>
+                        <div style={styles.tdName}>
+                          <div style={styles.smallAvatar}>{a.name.charAt(0)}</div>
+                          <span style={styles.tdNameText}>{a.name}</span>
+                        </div>
+                      </td>
+                      <td style={styles.td}>{a.alumni_profile?.batch_year || "—"}</td>
+                      <td style={styles.td}>{a.alumni_profile?.current_job || "—"}</td>
+                      <td style={styles.td}>{a.alumni_profile?.company || "—"}</td>
+                      <td style={styles.td}>
+                        <span style={{
+                          ...styles.badge,
+                          background: s.bg,
+                          color: s.color
+                        }}>
+                          {a.alumni_profile?.status || "unknown"}
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </main>
     </div>
   )
 }
 
-function InfoRow({ label, value }) {
-  return (
-    <div className="flex justify-between text-sm">
-      <span className="text-gray-400">{label}</span>
-      <span className="text-gray-700 font-medium">{value}</span>
-    </div>
-  )
-}
-
-function StatCard({ number, label, color }) {
-  const colors = {
-    blue: "bg-blue-50 text-blue-600",
-    green: "bg-green-50 text-green-600",
-    purple: "bg-purple-50 text-purple-600",
-  }
-  return (
-    <div className={`rounded-xl p-4 text-center ${colors[color]}`}>
-      <p className="text-2xl font-bold">{number}</p>
-      <p className="text-sm mt-1">{label}</p>
-    </div>
-  )
+const styles = {
+  wrapper: { display: 'flex', minHeight: '100vh', background: '#f1f5f9', fontFamily: 'sans-serif' },
+  sidebar: {
+    width: '240px', background: '#1e3a8a', display: 'flex',
+    flexDirection: 'column', padding: '24px 0', position: 'fixed',
+    top: 0, left: 0, height: '100vh', zIndex: 10,
+  },
+  sidebarLogo: {
+    display: 'flex', alignItems: 'center', gap: '12px',
+    padding: '0 20px 24px', borderBottom: '1px solid rgba(255,255,255,0.1)',
+    marginBottom: '16px',
+  },
+  logoMark: {
+    width: '36px', height: '36px', background: '#2563eb',
+    borderRadius: '10px', display: 'flex', alignItems: 'center',
+    justifyContent: 'center', color: 'white', fontWeight: '700', fontSize: '14px',
+  },
+  logoText: { color: 'white', fontWeight: '700', fontSize: '16px' },
+  sidebarNav: { flex: 1, padding: '0 12px', display: 'flex', flexDirection: 'column', gap: '4px' },
+  navItem: {
+    display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px',
+    borderRadius: '10px', border: 'none', background: 'transparent',
+    color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: '14px',
+    fontWeight: '500', transition: 'all 0.15s', textAlign: 'left', width: '100%',
+  },
+  navItemActive: { background: '#2563eb', color: 'white' },
+  navIcon: { fontSize: '16px', width: '20px', textAlign: 'center' },
+  logoutBtn: {
+    display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 24px',
+    border: 'none', background: 'transparent', color: 'rgba(255,255,255,0.6)',
+    cursor: 'pointer', fontSize: '14px', borderTop: '1px solid rgba(255,255,255,0.1)',
+    marginTop: '8px', paddingTop: '16px', transition: 'all 0.15s', width: '100%',
+  },
+  main: { marginLeft: '240px', flex: 1, padding: '32px', minHeight: '100vh' },
+  topBar: {
+    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+    marginBottom: '28px',
+  },
+  pageTitle: { fontSize: '24px', fontWeight: '700', color: '#0f172a', margin: '0 0 4px' },
+  pageSubtitle: { fontSize: '14px', color: '#64748b', margin: 0 },
+  topBarRight: { display: 'flex', alignItems: 'center', gap: '12px' },
+  avatar: {
+    width: '40px', height: '40px', borderRadius: '50%', background: '#1d4ed8',
+    color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontWeight: '700', fontSize: '16px',
+  },
+  heroCard: {
+    background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)',
+    borderRadius: '16px', padding: '28px 32px', marginBottom: '24px',
+    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+  },
+  heroLeft: { display: 'flex', alignItems: 'center', gap: '20px' },
+  heroBigAvatar: {
+    width: '64px', height: '64px', borderRadius: '50%',
+    background: 'rgba(255,255,255,0.15)', border: '3px solid rgba(255,255,255,0.3)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    color: 'white', fontWeight: '700', fontSize: '24px',
+  },
+  heroName: { fontSize: '22px', fontWeight: '700', color: 'white', margin: '0 0 4px' },
+  heroEmail: { fontSize: '14px', color: 'rgba(255,255,255,0.7)', margin: '0 0 10px' },
+  heroBadges: { display: 'flex', gap: '8px' },
+  batchBadge: {
+    background: 'rgba(255,255,255,0.15)', color: 'white',
+    padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '600',
+  },
+  statusBadge: {
+    padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '600',
+  },
+  editBtn: {
+    background: 'rgba(255,255,255,0.1)', border: '1.5px solid rgba(255,255,255,0.3)',
+    color: 'white', padding: '10px 20px', borderRadius: '10px',
+    cursor: 'pointer', fontSize: '14px', fontWeight: '600', transition: 'all 0.2s',
+  },
+  statsGrid: {
+    display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+    gap: '16px', marginBottom: '24px',
+  },
+  statCard: {
+    borderRadius: '14px', padding: '20px', textAlign: 'center',
+  },
+  statIcon: { fontSize: '24px', marginBottom: '8px' },
+  statValue: { fontSize: '28px', fontWeight: '700', color: '#0f172a', marginBottom: '4px' },
+  statLabel: { fontSize: '13px', color: '#64748b', fontWeight: '500' },
+  infoGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' },
+  infoCard: { background: 'white', borderRadius: '14px', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' },
+  cardHeader: { marginBottom: '16px' },
+  cardTitle: { fontSize: '15px', fontWeight: '700', color: '#0f172a', margin: '0 0 10px' },
+  cardDivider: { height: '1px', background: '#f1f5f9' },
+  infoList: { display: 'flex', flexDirection: 'column', gap: '12px', paddingTop: '8px' },
+  infoRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+  infoLabel: { fontSize: '13px', color: '#94a3b8', fontWeight: '500' },
+  infoValue: { fontSize: '13px', color: '#334155', fontWeight: '600' },
+  tableCard: { background: 'white', borderRadius: '14px', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' },
+  table: { width: '100%', borderCollapse: 'collapse', marginTop: '8px' },
+  th: {
+    textAlign: 'left', padding: '10px 12px', fontSize: '12px',
+    color: '#94a3b8', fontWeight: '600', textTransform: 'uppercase',
+    letterSpacing: '0.5px', borderBottom: '1px solid #f1f5f9',
+  },
+  tr: { transition: 'background 0.15s', cursor: 'default' },
+  td: { padding: '12px', fontSize: '14px', color: '#334155', borderBottom: '1px solid #f8fafc' },
+  tdName: { display: 'flex', alignItems: 'center', gap: '10px' },
+  smallAvatar: {
+    width: '32px', height: '32px', borderRadius: '50%', background: '#dbeafe',
+    color: '#1d4ed8', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontWeight: '700', fontSize: '13px',
+  },
+  tdNameText: { fontWeight: '600', color: '#0f172a' },
+  badge: { padding: '3px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: '600' },
+  emptyText: { textAlign: 'center', color: '#94a3b8', padding: '32px' },
 }
 
 export default Dashboard
