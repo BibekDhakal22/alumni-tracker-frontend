@@ -40,6 +40,28 @@ function AdminPanel() {
     navigate("/")
   }
 
+  const handleExport = async () => {
+    try {
+      const token = localStorage.getItem("token")
+      const response = await fetch("http://127.0.0.1:8000/api/alumni/export", {
+        headers: {
+          Authorization: "Bearer " + token,
+          Accept: "text/csv",
+        },
+      })
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = "alumni_export.csv"
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
+    } catch (err) {
+      alert("Failed to export data")
+    }
+  }
   const filtered = alumniList.filter((a) => {
     const matchSearch =
       a.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -108,6 +130,7 @@ function AdminPanel() {
           </div>
           <button
             style={styles.exportBtn}
+            onClick={handleExport}
             onMouseEnter={e => e.currentTarget.style.background = '#15803d'}
             onMouseLeave={e => e.currentTarget.style.background = '#16a34a'}
           >
