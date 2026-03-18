@@ -64,6 +64,8 @@ function EditProfile() {
             { icon: "◎", label: "Edit Profile", path: "/profile/edit", active: true },
             { icon: "◈", label: "Job Board", path: "/jobs" },
             { icon: "◉", label: "Analytics", path: "/analytics" },
+            { icon: "🗓", label: "Events", path: "/events" },
+            { icon: "🤝", label: "Mentorship", path: "/mentorship" },
           ].map(item => (
             <button key={item.path} onClick={() => navigate(item.path)}
               style={{ ...styles.navItem, ...(item.active ? styles.navItemActive : {}) }}

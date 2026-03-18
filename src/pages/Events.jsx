@@ -91,6 +91,7 @@ function Events() {
             { icon: "🗓", label: "Events", path: "/events", active: true },
             { icon: "◉", label: "Analytics", path: "/analytics" },
             ...(user?.role === "admin" ? [{ icon: "⊛", label: "Admin Panel", path: "/admin" }] : []),
+            { icon: "🤝", label: "Mentorship", path: "/mentorship" },
           ].map(item => (
             <button key={item.path} onClick={() => navigate(item.path)}
               style={{ ...styles.navItem, ...(item.active ? styles.navItemActive : {}) }}

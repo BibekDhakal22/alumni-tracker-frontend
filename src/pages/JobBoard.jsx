@@ -83,6 +83,8 @@ function JobBoard() {
             { icon: "⊞", label: "Dashboard", path: "/dashboard" },
             { icon: "◈", label: "Job Board", path: "/jobs", active: true },
             { icon: "◉", label: "Analytics", path: "/analytics" },
+            { icon: "🤝", label: "Mentorship", path: "/mentorship" },
+            { icon: "🗓", label: "Events", path: "/events" },
           ].map(item => (
             <button key={item.path} onClick={() => navigate(item.path)}
               style={{ ...styles.navItem, ...(item.active ? styles.navItemActive : {}) }}

@@ -9,6 +9,8 @@ import Analytics from "./pages/Analytics"
 import ProtectedRoute from "./components/ProtectedRoute"
 import ProfilePrint from "./pages/ProfilePrint"
 import Events from "./pages/Events"
+import Mentorship from "./pages/Mentorship"
+
 
 function App() {
   return (
@@ -49,6 +51,11 @@ function App() {
         <Route path="/events" element={
           <ProtectedRoute>
             <Events />
+          </ProtectedRoute>
+        } />
+        <Route path="/mentorship" element={
+          <ProtectedRoute>
+            <Mentorship />
           </ProtectedRoute>
         } />
       </Routes>
