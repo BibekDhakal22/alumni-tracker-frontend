@@ -8,6 +8,7 @@ import JobBoard from "./pages/JobBoard"
 import Analytics from "./pages/Analytics"
 import ProtectedRoute from "./components/ProtectedRoute"
 import ProfilePrint from "./pages/ProfilePrint"
+import Events from "./pages/Events"
 
 function App() {
   return (
@@ -43,6 +44,11 @@ function App() {
         <Route path="/profile/print" element={
           <ProtectedRoute>
             <ProfilePrint />
+          </ProtectedRoute>
+        } />
+        <Route path="/events" element={
+          <ProtectedRoute>
+            <Events />
           </ProtectedRoute>
         } />
       </Routes>
