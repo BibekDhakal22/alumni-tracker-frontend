@@ -9,6 +9,7 @@ function Dashboard() {
   const [alumniList, setAlumniList] = useState([])
   const [loading, setLoading] = useState(true)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [search, setSearch] = useState("")
 
   useEffect(() => {
     if (!user) { navigate("/"); return }
@@ -37,6 +38,13 @@ function Dashboard() {
   const employed = alumniList.filter(a => a.alumni_profile?.status === "employed").length
   const total = alumniList.length
   const batches = [...new Set(alumniList.map(a => a.alumni_profile?.batch_year).filter(Boolean))]
+
+  const filteredAlumni = alumniList.filter(a =>
+  a.name.toLowerCase().includes(search.toLowerCase()) ||
+  a.email.toLowerCase().includes(search.toLowerCase()) ||
+  a.alumni_profile?.batch_year?.includes(search) ||
+  a.alumni_profile?.company?.toLowerCase().includes(search.toLowerCase())
+)
 
   const statusColor = {
     employed: { bg: '#dcfce7', color: '#15803d' },
@@ -124,14 +132,24 @@ function Dashboard() {
               </div>
             </div>
           </div>
-          <button
-            style={styles.editBtn}
-            onClick={() => navigate("/profile/edit")}
-            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
-          >
-            Edit Profile
-          </button>
+         <div style={{display: 'flex', gap: '10px'}}>
+            <button
+              style={styles.printBtn}
+              onClick={() => navigate("/profile/print")}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+            >
+              ↓ Export PDF
+            </button>
+            <button
+              style={styles.editBtn}
+              onClick={() => navigate("/profile/edit")}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+            >
+              Edit Profile
+            </button>
+          </div>
         </div>
 
         {/* Stats Row */}
@@ -198,14 +216,25 @@ function Dashboard() {
         </div>
 
         {/* Recent Alumni */}
+        {/* Recent Alumni */}
         <div style={styles.tableCard}>
-          <div style={styles.cardHeader}>
-            <h3 style={styles.cardTitle}>Recent Alumni</h3>
-            <div style={styles.cardDivider} />
+          <div style={{ ...styles.cardHeader, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={styles.cardTitle}>Alumni Directory</h3>
+            <div style={styles.searchWrapper}>
+              <span style={styles.searchIcon}>🔍</span>
+              <input
+                type="text"
+                placeholder="Search alumni..."
+                style={styles.searchInput}
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
+            </div>
           </div>
+          <div style={styles.cardDivider} />
           {loading ? (
             <p style={styles.emptyText}>Loading...</p>
-          ) : alumniList.length === 0 ? (
+          ) : filteredAlumni.length === 0 ? (
             <p style={styles.emptyText}>No alumni found</p>
           ) : (
             <table style={styles.table}>
@@ -217,7 +246,7 @@ function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {alumniList.slice(0, 5).map((a, i) => {
+                {filteredAlumni.slice(0, 8).map((a, i) => {
                   const s = statusColor[a.alumni_profile?.status] || statusColor.unemployed
                   return (
                     <tr key={i} style={styles.tr}
@@ -234,11 +263,7 @@ function Dashboard() {
                       <td style={styles.td}>{a.alumni_profile?.current_job || "—"}</td>
                       <td style={styles.td}>{a.alumni_profile?.company || "—"}</td>
                       <td style={styles.td}>
-                        <span style={{
-                          ...styles.badge,
-                          background: s.bg,
-                          color: s.color
-                        }}>
+                        <span style={{ ...styles.badge, background: s.bg, color: s.color }}>
                           {a.alumni_profile?.status || "unknown"}
                         </span>
                       </td>
@@ -364,6 +389,19 @@ const styles = {
   tdNameText: { fontWeight: '600', color: '#0f172a' },
   badge: { padding: '3px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: '600' },
   emptyText: { textAlign: 'center', color: '#94a3b8', padding: '32px' },
+
+  searchWrapper: { position: 'relative', display: 'flex', alignItems: 'center' },
+  searchIcon: { position: 'absolute', left: '10px', fontSize: '13px', pointerEvents: 'none' },
+  searchInput: {
+    padding: '8px 12px 8px 32px', border: '1.5px solid #e2e8f0',
+    borderRadius: '8px', fontSize: '13px', outline: 'none',
+    background: '#f8fafc', width: '200px',
+  },
+  printBtn: {
+    background: 'rgba(255,255,255,0.1)', border: '1.5px solid rgba(255,255,255,0.3)',
+    color: 'white', padding: '10px 20px', borderRadius: '10px',
+    cursor: 'pointer', fontSize: '14px', fontWeight: '600', transition: 'all 0.2s',
+  },
 }
 
 export default Dashboard

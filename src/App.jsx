@@ -7,6 +7,7 @@ import EditProfile from "./pages/EditProfile"
 import JobBoard from "./pages/JobBoard"
 import Analytics from "./pages/Analytics"
 import ProtectedRoute from "./components/ProtectedRoute"
+import ProfilePrint from "./pages/ProfilePrint"
 
 function App() {
   return (
@@ -37,6 +38,11 @@ function App() {
         <Route path="/admin" element={
           <ProtectedRoute adminOnly={true}>
             <AdminPanel />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile/print" element={
+          <ProtectedRoute>
+            <ProfilePrint />
           </ProtectedRoute>
         } />
       </Routes>
