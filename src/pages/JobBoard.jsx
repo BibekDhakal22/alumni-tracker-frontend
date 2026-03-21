@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import api from "../services/api"
 import Spinner from "../components/Spinner"
+import Sidebar from "../components/Sidebar"
 
 function JobBoard() {
   const navigate = useNavigate()
@@ -74,36 +75,7 @@ function JobBoard() {
   return (
     <div style={styles.wrapper}>
       {/* Sidebar */}
-      <aside style={styles.sidebar}>
-        <div style={styles.sidebarLogo}>
-          <div style={styles.logoMark}>AT</div>
-          <span style={styles.logoText}>Alumni Tracker</span>
-        </div>
-        <nav style={styles.sidebarNav}>
-          {[
-            { icon: "⊞", label: "Dashboard", path: "/dashboard" },
-            { icon: "◈", label: "Job Board", path: "/jobs", active: true },
-            { icon: "◉", label: "Analytics", path: "/analytics" },
-            { icon: "🤝", label: "Mentorship", path: "/mentorship" },
-            { icon: "🗓", label: "Events", path: "/events" },
-          ].map(item => (
-            <button key={item.path} onClick={() => navigate(item.path)}
-              style={{ ...styles.navItem, ...(item.active ? styles.navItemActive : {}) }}
-              onMouseEnter={e => !item.active && (e.currentTarget.style.background = '#1e3a8a')}
-              onMouseLeave={e => !item.active && (e.currentTarget.style.background = 'transparent')}
-            >
-              <span style={styles.navIcon}>{item.icon}</span>
-              <span>{item.label}</span>
-            </button>
-          ))}
-        </nav>
-        <button onClick={handleLogout} style={styles.logoutBtn}
-          onMouseEnter={e => e.currentTarget.style.background = '#1e3a8a'}
-          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-        >
-          <span style={styles.navIcon}>→</span><span>Logout</span>
-        </button>
-      </aside>
+     <Sidebar />
 
       <main style={styles.main}>
         {/* Header */}

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import api from "../services/api"
+import Sidebar from "../components/Sidebar"
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, LineChart, Line
@@ -65,35 +66,7 @@ function Analytics() {
   return (
     <div style={styles.wrapper}>
       {/* Sidebar */}
-      <aside style={styles.sidebar}>
-        <div style={styles.sidebarLogo}>
-          <div style={styles.logoMark}>AT</div>
-          <span style={styles.logoText}>Alumni Tracker</span>
-        </div>
-        <nav style={styles.sidebarNav}>
-          {[
-            { icon: "⊞", label: "Dashboard", path: "/dashboard" },
-            { icon: "◈", label: "Job Board", path: "/jobs" },
-            { icon: "◉", label: "Analytics", path: "/analytics", active: true },
-            ...(user?.role === "admin" ? [{ icon: "⊛", label: "Admin Panel", path: "/admin" }] : []),
-          ].map(item => (
-            <button key={item.path} onClick={() => navigate(item.path)}
-              style={{ ...styles.navItem, ...(item.active ? styles.navItemActive : {}) }}
-              onMouseEnter={e => !item.active && (e.currentTarget.style.background = '#1e3a8a')}
-              onMouseLeave={e => !item.active && (e.currentTarget.style.background = 'transparent')}
-            >
-              <span style={styles.navIcon}>{item.icon}</span>
-              <span>{item.label}</span>
-            </button>
-          ))}
-        </nav>
-        <button onClick={handleLogout} style={styles.logoutBtn}
-          onMouseEnter={e => e.currentTarget.style.background = '#1e3a8a'}
-          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-        >
-          <span style={styles.navIcon}>→</span><span>Logout</span>
-        </button>
-      </aside>
+      <Sidebar />
 
       <main style={styles.main}>
         {/* Header */}
