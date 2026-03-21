@@ -174,7 +174,7 @@ function Register() {
 
           <button
             style={styles.loginBtn}
-            onClick={() => navigate("/")}
+           onClick={() => navigate("/login")}
             onMouseEnter={e => e.target.style.background = '#eff6ff'}
             onMouseLeave={e => e.target.style.background = 'white'}
           >

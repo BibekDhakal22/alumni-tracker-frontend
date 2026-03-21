@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import api from "../services/api"
+import Spinner from "../components/Spinner"
 
 function Mentorship() {
   const navigate = useNavigate()
@@ -224,7 +225,7 @@ function Mentorship() {
                 />
               </div>
             </div>
-            {loading ? (
+            {loading ?  (
               <p style={styles.emptyText}>Loading mentors...</p>
             ) : filteredMentors.length === 0 ? (
               <div style={styles.emptyState}>
