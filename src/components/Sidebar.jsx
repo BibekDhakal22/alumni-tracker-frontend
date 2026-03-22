@@ -20,6 +20,7 @@ function Sidebar() {
     { icon: "🗓", label: "Events", path: "/events" },
     { icon: "🤝", label: "Mentorship", path: "/mentorship" },
     { icon: "◉", label: "Analytics", path: "/analytics" },
+    { icon: "👥", label: "Alumni Gallery", path: "/gallery" },
     ...(user?.role === "admin" ? [{ icon: "⊛", label: "Admin Panel", path: "/admin" }] : []),
   ]
 

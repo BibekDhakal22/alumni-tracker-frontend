@@ -12,6 +12,7 @@ import Mentorship from "./pages/Mentorship"
 import ProfilePrint from "./pages/ProfilePrint"
 import ProtectedRoute from "./components/ProtectedRoute"
 import NotFound from "./pages/NotFound"
+import AlumniGallery from "./pages/AlumniGallery"
 
 function App() {
   return (
@@ -45,6 +46,11 @@ function App() {
           <ProtectedRoute adminOnly={true}><AdminPanel /></ProtectedRoute>
         } />
         <Route path="*" element={<NotFound />} />
+        <Route path="/gallery" element={
+          <ProtectedRoute>
+            <AlumniGallery />
+          </ProtectedRoute>
+        } />
       </Routes>
     </HashRouter>
   )
