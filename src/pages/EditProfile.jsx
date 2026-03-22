@@ -21,6 +21,38 @@ function EditProfile() {
     linkedin: profile?.linkedin || "",
     status: profile?.status || "unemployed",
   })
+  const [passwordData, setPasswordData] = useState({
+  current_password: "",
+  new_password: "",
+  new_password_confirmation: "",
+})
+const [changingPassword, setChangingPassword] = useState(false)
+const [passwordSuccess, setPasswordSuccess] = useState("")
+const [passwordError, setPasswordError] = useState("")
+
+const handleChangePassword = async () => {
+  if (!passwordData.current_password || !passwordData.new_password) {
+    setPasswordError("Please fill in all password fields")
+    return
+  }
+  if (passwordData.new_password !== passwordData.new_password_confirmation) {
+    setPasswordError("New passwords do not match")
+    return
+  }
+  setChangingPassword(true)
+  setPasswordError("")
+  setPasswordSuccess("")
+  try {
+    await api.post("/change-password", passwordData)
+    setPasswordSuccess("Password changed successfully!")
+    setPasswordData({ current_password: "", new_password: "", new_password_confirmation: "" })
+    setTimeout(() => setPasswordSuccess(""), 3000)
+  } catch (err) {
+    setPasswordError(err.response?.data?.message || "Failed to change password")
+  } finally {
+    setChangingPassword(false)
+  }
+}
 
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState("")
@@ -110,6 +142,12 @@ function EditProfile() {
             )}
             {error && (
               <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', padding: '12px 16px', borderRadius: '10px', marginBottom: '20px', fontSize: '14px' }}>⚠ {error}</div>
+            )}
+            {passwordSuccess && (
+              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', color: '#15803d', padding: '12px 16px', borderRadius: '10px', marginBottom: '20px', fontSize: '14px' }}>✓ {passwordSuccess}</div>
+            )}
+            {passwordError && (
+              <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', padding: '12px 16px', borderRadius: '10px', marginBottom: '20px', fontSize: '14px' }}>⚠ {passwordError}</div>
             )}
 
             <form onSubmit={handleSubmit}>
@@ -215,6 +253,47 @@ function EditProfile() {
                   onMouseLeave={e => e.currentTarget.style.background = isDark ? '#334155' : 'white'}
                 >Cancel</button>
               </div>
+              {/* Change Password Section */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px', paddingTop: '20px', borderTop: `1px solid ${border}` }}>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#dc2626', flexShrink: 0 }} />
+                <h3 style={{ fontSize: '15px', fontWeight: '700', color: text, margin: 0 }}>Change Password</h3>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: subtext, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Current Password</label>
+                  <input type="password" name="current_password"
+                    style={{ width: '100%', padding: '10px 14px', border: `1.5px solid ${inputBorder}`, borderRadius: '10px', fontSize: '14px', outline: 'none', background: inputBg, color: text, boxSizing: 'border-box', fontFamily: 'sans-serif' }}
+                    placeholder="••••••••"
+                    value={passwordData.current_password}
+                    onChange={e => setPasswordData({ ...passwordData, current_password: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: subtext, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>New Password</label>
+                  <input type="password" name="new_password"
+                    style={{ width: '100%', padding: '10px 14px', border: `1.5px solid ${inputBorder}`, borderRadius: '10px', fontSize: '14px', outline: 'none', background: inputBg, color: text, boxSizing: 'border-box', fontFamily: 'sans-serif' }}
+                    placeholder="Min 6 characters"
+                    value={passwordData.new_password}
+                    onChange={e => setPasswordData({ ...passwordData, new_password: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: subtext, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Confirm Password</label>
+                  <input type="password" name="new_password_confirmation"
+                    style={{ width: '100%', padding: '10px 14px', border: `1.5px solid ${inputBorder}`, borderRadius: '10px', fontSize: '14px', outline: 'none', background: inputBg, color: text, boxSizing: 'border-box', fontFamily: 'sans-serif' }}
+                    placeholder="Repeat new password"
+                    value={passwordData.new_password_confirmation}
+                    onChange={e => setPasswordData({ ...passwordData, new_password_confirmation: e.target.value })}
+                  />
+                </div>
+              </div>
+              <button type="button"
+                onClick={handleChangePassword}
+                disabled={changingPassword}
+                style={{ padding: '10px 20px', background: isDark ? '#334155' : '#f1f5f9', color: text, border: `1.5px solid ${inputBorder}`, borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', marginBottom: '20px' }}
+              >
+                {changingPassword ? "Changing..." : "Change Password"}
+              </button>
             </form>
           </div>
         </div>
