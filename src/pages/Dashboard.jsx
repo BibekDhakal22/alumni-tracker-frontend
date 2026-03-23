@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext"
 import { useTheme } from "../context/ThemeContext"
 import api from "../services/api"
 import Sidebar from "../components/Sidebar"
+import Avatar from "../components/Avatar"
 
 function Dashboard() {
   const navigate = useNavigate()
@@ -69,13 +70,7 @@ function Dashboard() {
             <h1 style={{ fontSize: '24px', fontWeight: '700', color: text, margin: '0 0 4px' }}>Dashboard</h1>
             <p style={{ fontSize: '14px', color: subtext, margin: 0 }}>Welcome back, {user.name}</p>
           </div>
-          <div style={{
-            width: '40px', height: '40px', borderRadius: '50%', background: '#1d4ed8',
-            color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontWeight: '700', fontSize: '16px',
-          }}>
-            {user.name.charAt(0)}
-          </div>
+         <Avatar name={user.name} photo={profile?.photo} size={64} fontSize={24} />
         </header>
 
         {/* Profile Hero Card */}
@@ -220,9 +215,7 @@ function Dashboard() {
                     >
                       <td style={{ padding: '12px', fontSize: '14px', color: text, borderBottom: `1px solid ${border}` }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#dbeafe', color: '#1d4ed8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '13px' }}>
-                            {a.name.charAt(0)}
-                          </div>
+                          <Avatar name={a.name} photo={a.alumni_profile?.photo} size={32} fontSize={13} />
                           <span style={{ fontWeight: '600' }}>{a.name}</span>
                         </div>
                       </td>

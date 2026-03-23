@@ -4,12 +4,15 @@ import { useAuth } from "../context/AuthContext"
 import { useTheme } from "../context/ThemeContext"
 import api from "../services/api"
 import Sidebar from "../components/Sidebar"
+import Avatar from "../components/Avatar"
 
 function EditProfile() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const { isDark } = useTheme()
   const profile = user?.alumni_profile
+  const [uploading, setUploading] = useState(false)
+const [photoSuccess, setPhotoSuccess] = useState("")
 
   const [formData, setFormData] = useState({
     batch_year: profile?.batch_year || "",
@@ -51,6 +54,37 @@ const handleChangePassword = async () => {
     setPasswordError(err.response?.data?.message || "Failed to change password")
   } finally {
     setChangingPassword(false)
+  }
+}
+
+const handlePhotoUpload = async (e) => {
+  const file = e.target.files[0]
+  if (!file) return
+  setUploading(true)
+  try {
+    const formDataPhoto = new FormData()
+    formDataPhoto.append('photo', file)
+    const token = localStorage.getItem('token')
+    const response = await fetch('http://127.0.0.1:8000/api/profile/photo', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token },
+      body: formDataPhoto,
+    })
+    const data = await response.json()
+    if (response.ok) {
+      const updatedUser = {
+        ...user,
+        alumni_profile: { ...profile, photo: data.photo }
+      }
+      localStorage.setItem('user', JSON.stringify(updatedUser))
+      setPhotoSuccess("Photo uploaded successfully!")
+      setTimeout(() => setPhotoSuccess(""), 3000)
+      window.location.reload()
+    }
+  } catch (err) {
+    console.error("Photo upload failed", err)
+  } finally {
+    setUploading(false)
   }
 }
 
@@ -113,9 +147,21 @@ const handleChangePassword = async () => {
 
           {/* Profile Card */}
           <div style={{ background: card, borderRadius: '16px', padding: '28px', textAlign: 'center', border: `1px solid ${border}` }}>
-            <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#1d4ed8', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '32px', margin: '0 auto 16px' }}>
-              {user?.name?.charAt(0)}
-            </div>
+            <div style={{ position: 'relative', width: '80px', margin: '0 auto 16px' }}>
+  <Avatar name={user?.name} photo={profile?.photo} size={80} fontSize={32} />
+  <label style={{
+    position: 'absolute', bottom: 0, right: 0,
+    width: '28px', height: '28px', borderRadius: '50%',
+    background: '#1d4ed8', color: 'white', display: 'flex',
+    alignItems: 'center', justifyContent: 'center',
+    cursor: 'pointer', fontSize: '14px', border: '2px solid white',
+  }}>
+    📷
+    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handlePhotoUpload} />
+  </label>
+</div>
+{uploading && <p style={{ fontSize: '12px', color: subtext, margin: '0 0 8px' }}>Uploading...</p>}
+{photoSuccess && <p style={{ fontSize: '12px', color: '#15803d', margin: '0 0 8px' }}>{photoSuccess}</p>}
             <h3 style={{ fontSize: '18px', fontWeight: '700', color: text, margin: '0 0 6px' }}>{user?.name}</h3>
             <p style={{ fontSize: '13px', color: subtext, margin: '0 0 12px' }}>{user?.email}</p>
             <span style={{ display: 'inline-block', background: '#dbeafe', color: '#1d4ed8', padding: '4px 14px', borderRadius: '20px', fontSize: '13px', fontWeight: '600' }}>
