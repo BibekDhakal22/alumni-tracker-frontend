@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import { useTheme } from "../context/ThemeContext"
+import Avatar from "./Avatar"
 
 function Sidebar() {
   const navigate = useNavigate()
@@ -80,7 +81,7 @@ function Sidebar() {
 
         {/* User Info */}
         <div style={styles.userInfo}>
-          <div style={styles.userAvatar}>{user?.name?.charAt(0)}</div>
+          <Avatar name={user?.name} photo={user?.alumni_profile?.photo} size={32} fontSize={13} />
           <div style={styles.userDetails}>
             <div style={styles.userName}>{user?.name}</div>
             <div style={styles.userRole}>{user?.role}</div>

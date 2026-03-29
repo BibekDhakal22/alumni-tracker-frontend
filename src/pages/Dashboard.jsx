@@ -80,13 +80,8 @@ function Dashboard() {
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <div style={{
-              width: '64px', height: '64px', borderRadius: '50%',
-              background: 'rgba(255,255,255,0.15)', border: '3px solid rgba(255,255,255,0.3)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'white', fontWeight: '700', fontSize: '24px',
-            }}>
-              {user.name.charAt(0)}
+            <div style={{ border: '3px solid rgba(255,255,255,0.3)', borderRadius: '50%' }}>
+              <Avatar name={user.name} photo={profile?.photo} size={64} fontSize={24} />
             </div>
             <div>
               <h2 style={{ fontSize: '22px', fontWeight: '700', color: 'white', margin: '0 0 4px' }}>{user.name}</h2>
