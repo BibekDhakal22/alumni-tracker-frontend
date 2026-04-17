@@ -5,6 +5,7 @@ import { useTheme } from "../context/ThemeContext"
 import api from "../services/api"
 import Sidebar from "../components/Sidebar"
 import Avatar from "../components/Avatar"
+import NotificationBell from "../components/NotificationBell"
 
 function Dashboard() {
   const navigate = useNavigate()
@@ -70,7 +71,16 @@ function Dashboard() {
             <h1 style={{ fontSize: '24px', fontWeight: '700', color: text, margin: '0 0 4px' }}>Dashboard</h1>
             <p style={{ fontSize: '14px', color: subtext, margin: 0 }}>Welcome back, {user.name}</p>
           </div>
-         <Avatar name={user.name} photo={profile?.photo} size={64} fontSize={24} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <NotificationBell />
+            <div style={{
+              width: '40px', height: '40px', borderRadius: '50%', background: '#1d4ed8',
+              color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontWeight: '700', fontSize: '16px',
+            }}>
+              {user.name.charAt(0)}
+            </div>
+          </div>
         </header>
 
         {/* Profile Hero Card */}
