@@ -135,7 +135,7 @@ function NotificationBell() {
       {/* Notification Panel */}
       {showPanel && (
         <div style={{
-          position: 'absolute', top: '48px', right: 0,
+          position: 'absolute', bottom: '48px', left: '0',
           width: '360px', background: card,
           borderRadius: '16px', boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
           border: `1px solid ${border}`, zIndex: 1000, overflow: 'hidden',

@@ -71,16 +71,7 @@ function Dashboard() {
             <h1 style={{ fontSize: '24px', fontWeight: '700', color: text, margin: '0 0 4px' }}>Dashboard</h1>
             <p style={{ fontSize: '14px', color: subtext, margin: 0 }}>Welcome back, {user.name}</p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <NotificationBell />
-            <div style={{
-              width: '40px', height: '40px', borderRadius: '50%', background: '#1d4ed8',
-              color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontWeight: '700', fontSize: '16px',
-            }}>
-              {user.name.charAt(0)}
-            </div>
-          </div>
+          <Avatar name={user.name} photo={profile?.photo} size={40} fontSize={16} />
         </header>
 
         {/* Profile Hero Card */}
