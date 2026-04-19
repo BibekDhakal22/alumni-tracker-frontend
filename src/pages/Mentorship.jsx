@@ -232,12 +232,18 @@ function Mentorship() {
                       )}
                       <span style={{ background: isDark ? '#1e3a8a' : '#f1f5f9', color: isDark ? '#93c5fd' : '#64748b', padding: '3px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: '500' }}>Batch {mentor.alumni_profile?.batch_year}</span>
                     </div>
-                    <button
-                      style={{ width: '100%', padding: '10px', background: '#1d4ed8', color: 'white', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}
-                      onClick={() => { setSelectedMentor(mentor); setShowRequestForm(true) }}
-                      onMouseEnter={e => e.currentTarget.style.background = '#1e40af'}
-                      onMouseLeave={e => e.currentTarget.style.background = '#1d4ed8'}
-                    >Request Mentorship</button>
+                    {user?.id === mentor.id ? (
+                      <div style={{ width: '100%', padding: '10px', background: isDark ? '#1e293b' : '#f1f5f9', color: subtext, borderRadius: '10px', fontSize: '14px', fontWeight: '600', textAlign: 'center' }}>
+                        Your Profile
+                      </div>
+                    ) : (
+                      <button
+                        style={{ width: '100%', padding: '10px', background: '#1d4ed8', color: 'white', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}
+                        onClick={() => { setSelectedMentor(mentor); setShowRequestForm(true) }}
+                        onMouseEnter={e => e.currentTarget.style.background = '#1e40af'}
+                        onMouseLeave={e => e.currentTarget.style.background = '#1d4ed8'}
+                      >Request Mentorship</button>
+                    )}
                   </div>
                 ))}
               </div>

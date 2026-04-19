@@ -230,10 +230,15 @@ function Events() {
                         <span style={{ fontSize: '13px', color: subtext }}>Organized by {event.created_by?.name}</span>
                       </div>
                       <div style={{ display: 'flex', gap: '8px' }}>
-                        {event.contact_email && (
+                        {event.contact_email && user?.id !== event.created_by?.id && (
                           <a href={"mailto:" + event.contact_email}
                             style={{ padding: '7px 16px', background: '#1d4ed8', color: 'white', borderRadius: '8px', fontSize: '13px', fontWeight: '600', textDecoration: 'none' }}
                           >Register</a>
+                        )}
+                        {user?.id === event.created_by?.id && (
+                          <span style={{ padding: '7px 16px', background: isDark ? '#1e293b' : '#f1f5f9', color: subtext, borderRadius: '8px', fontSize: '13px', fontWeight: '600' }}>
+                            Your Event
+                          </span>
                         )}
                         {(user?.role === "admin" || user?.id === event.created_by?.id) && (
                           <button onClick={() => handleDelete(event.id)}
