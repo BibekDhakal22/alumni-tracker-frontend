@@ -231,10 +231,15 @@ function JobBoard() {
                         {job.posted_by?.name} · {new Date(job.created_at).toLocaleDateString()}
                       </span>
                     </div>
-                    {job.contact_email && (
+                    {job.contact_email && user?.id !== job.posted_by?.id && (
                       <a href={"mailto:" + job.contact_email}
                         style={{ padding: '8px 16px', background: '#1d4ed8', color: 'white', borderRadius: '8px', fontSize: '13px', fontWeight: '600', textDecoration: 'none' }}
                       >Apply Now</a>
+                    )}
+                    {user?.id === job.posted_by?.id && (
+                      <span style={{ padding: '8px 16px', background: isDark ? '#1e293b' : '#f1f5f9', color: subtext, borderRadius: '8px', fontSize: '13px', fontWeight: '600' }}>
+                        Your Post
+                      </span>
                     )}
                   </div>
                 </div>
